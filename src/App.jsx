@@ -46,6 +46,11 @@ function App() {
         type: 'user',
       };
 
+      if (!("ai" in window) || !("languageDetector" in window.ai)) {
+        setError("Language Detection API is not supported by your browser.");
+        return;
+      }
+
       //Determine the language of input text, so it can be translated.
       const detector = await window.ai.languageDetector.create()
       const detectedLang = await detector.detect(inputText)
@@ -58,8 +63,7 @@ function App() {
 
     } catch (error) {
       console.error('Error detecting language:', error);
-      setError("Your   browser doesn't support the Translator or Language Detector APIs. If you're in Chrome, join the Early Preview Program to enable it.")
-      // setError("There was a problem detecting the language. Please try again.");
+      setError('Failed to detect language. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -67,6 +71,12 @@ function App() {
 
   //Summarize text
   const handleSummarize = async(messageId,text) => {
+    // Feature detection
+    if (!("ai" in window) || !("summarizer" in window.ai)) {
+      setError("Summarizer API is not supported by your browser.");
+      return;
+    }
+
     setIsLoading(true)
 
     try {
@@ -76,6 +86,7 @@ function App() {
       prev.map((msg) => msg.id === messageId? [...msg, summary]: msg))
     } catch (error) {
       console.error('Error summarizing text:',error)
+      setError('Failed to generate summary. Please try again.')
     } finally {
       setIsLoading(false)
     }
@@ -83,6 +94,11 @@ function App() {
 
    //Translate text
   const handleTranslate = async( messageId,text) => {
+    if (!("ai" in window) || !("translator" in window.ai)) {
+      setError("Translator API is not supported by your browser.");
+      return;
+    }
+    
     setIsLoading(true)
 
     if(sourceLang === targetLang) {
@@ -104,8 +120,8 @@ function App() {
       )
 
     } catch (error) {
-      // setError("Your   browser doesn't support the Translator or Language Detector APIs. If you're in Chrome, join the Early Preview Program to enable it.")
       console.error('Error Translating text:',error)
+      setError('Failed to translate text. Please try again.')
     }finally {
       setIsLoading(false)
     }
@@ -225,9 +241,16 @@ function App() {
               <FontAwesomeIcon icon={faPaperPlane} />
             </button>
           </div>
-
-          {error && <div className="p-2 bg-red-100 text-red-700 text-center" role="alert">{error}</div>}
         </div>
+        {error && (
+          <div className=" fixed bottom-4 rightt-4 border-red-400 shadow-lg p-4 bg-red-100 text-red-700 text-center">
+            <p>{error}</p>
+              <button 
+                onClick={() => setError('')}
+                className="mt-2 text-sm text-red-700 hover:text-red-900">
+                Close
+              </button>
+            </div>)}
     </div>
   )
 }
