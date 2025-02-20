@@ -58,7 +58,8 @@ function App() {
 
     } catch (error) {
       console.error('Error detecting language:', error);
-      setError("There was a problem detecting the language. Please try again.");
+      setError("Your   browser doesn't support the Translator or Language Detector APIs. If you're in Chrome, join the Early Preview Program to enable it.")
+      // setError("There was a problem detecting the language. Please try again.");
     } finally {
       setIsLoading(false);
     }
